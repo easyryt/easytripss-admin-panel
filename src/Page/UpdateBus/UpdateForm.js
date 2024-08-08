@@ -15,6 +15,7 @@ import axios from "axios";
 
 const UpdateForm = () => {
   const { id } = useParams();
+  const [isChecked, setIsChecked] = useState(false);
   const [busTittle, setBusTittle] = useState("");
   const [busNumber, setBusNumber] = useState("");
   const [busImage, setBusImage] = useState("");
@@ -337,6 +338,7 @@ const UpdateForm = () => {
       safetyMeasures,
       dailyPassengersTips,
       specialNotes,
+      isPublic:isChecked
     };
 
     // Send the data to the API
@@ -408,12 +410,27 @@ const UpdateForm = () => {
       },
     }));
   };
+
+  const handleCheckboxChange = (event) => {
+    setIsChecked(event.target.checked);
+  };
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
         Update Bus Route
       </Typography>
       <h2>1. Intro</h2>
+      <div>
+      <label>
+        blog Status :
+        <input 
+          type="checkbox" 
+          checked={isChecked} 
+          onChange={handleCheckboxChange} 
+        />
+        {isChecked ? "True" : "False"}
+      </label>
+    </div>
       <TextField
         label="Bus Title"
         value={busTittle}
