@@ -11,7 +11,7 @@ const BusDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`https://easytripss.onrender.com/public/bus/getSingleBus/${id}`)
+    axios.get(`https://easytripss.onrender.com/admin/bus/getSingleBus/${id}`)
       .then(response => {
         if (response.data.status) {
           setBusData(response.data.data);

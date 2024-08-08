@@ -13,7 +13,7 @@ const BusList = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios.get('https://easytripss.onrender.com/public/bus/getAllBus')
+    axios.get('https://easytripss.onrender.com/admin/bus/getAllBus')
       .then(response => {
         if (response.data.status) {
           setBusData(response.data.data);
