@@ -155,6 +155,8 @@ const ComplexForm = () => {
       "The 218c bus route is an alternative route that also serves the Babarpur Extension to Shadipur Depot corridor, offering passengers more travel options. Additionally, the Shadipur bus depot is a key hub, connecting various routes, including Shadipur to Janakpuri West and Shadipur to Tilak Nagar. For those travelling from Jhandewalan to Shadipur, the 218 bus route provides a direct and convenient service.\nThis popular route is operated by the Delhi Transport Corporation and is thus powered by eco-friendly CNG gases covering a total travel time of 1 hour. The 218 bus route ensures a reliable and efficient means of transportation for daily commuters and visitors in Delhi.",
   });
 
+  const [isChecked, setIsChecked] = useState(false);
+
   useEffect(() => {
     setSection1((prevSection) => ({
       ...prevSection,
@@ -273,6 +275,7 @@ const ComplexForm = () => {
       safetyMeasures,
       dailyPassengersTips,
       specialNotes,
+      isPublic:isChecked
     };
 
     try {
@@ -344,12 +347,27 @@ const ComplexForm = () => {
     }));
   };
 
+  const handleCheckboxChange = (event) => {
+    setIsChecked(event.target.checked);
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
         Create Bus Route
       </Typography>
       <h2>1. Intro</h2>
+      <div>
+      <label>
+        blog Status :
+        <input 
+          type="checkbox" 
+          checked={isChecked} 
+          onChange={handleCheckboxChange} 
+        />
+        {isChecked ? "True" : "False"}
+      </label>
+    </div>
       <TextField
         label="Bus Title"
         value={busTittle}
