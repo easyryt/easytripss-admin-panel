@@ -14,6 +14,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 const UpdateForm = () => {
+  const [updateState, setUpdateState] = useState(0);
+  const [BusImg, setBusImg] = useState([]);
   const { id } = useParams();
   const [isChecked, setIsChecked] = useState(false);
   const [busTittle, setBusTittle] = useState("");
@@ -132,9 +134,7 @@ const UpdateForm = () => {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(
-        `https://easytripss.onrender.com/public/bus/getSingleBus/${id}`
-      )
+      .get(`https://easytripss.onrender.com/public/bus/getSingleBus/${id}`)
       .then((response) => {
         if (response.data.status) {
           const data = response.data.data;
@@ -210,6 +210,10 @@ const UpdateForm = () => {
   }, [id]);
 
   useEffect(() => {
+    if (sessionStorage.getItem("img")) {
+      const image = JSON.parse(sessionStorage.getItem("img"));
+      setBusImage(image);
+    }
     setSection1((prev) => ({
       ...prev,
       title1: section1Title,
@@ -338,7 +342,7 @@ const UpdateForm = () => {
       safetyMeasures,
       dailyPassengersTips,
       specialNotes,
-      isPublic:isChecked
+      isPublic: isChecked,
     };
 
     // Send the data to the API
@@ -414,6 +418,51 @@ const UpdateForm = () => {
   const handleCheckboxChange = (event) => {
     setIsChecked(event.target.checked);
   };
+
+  const handleUploadImage = async () => {
+    try {
+      // Initialize a new FormData object
+      const formData = new FormData();
+
+      // Append the bus number and each image to the FormData object
+      BusImg.forEach((img, index) => {
+        formData.append("image", img);
+      });
+      formData.append("busNumber", busNumber);
+      // Make the POST request to upload the images
+      const response = await axios.post(
+        "https://easytripss.onrender.com/admin/bus/images/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      // Handle the response
+      if (response.status) {
+        sessionStorage.setItem(
+          "img",
+          JSON.stringify(response?.data?.data?.image?.url)
+        );
+        setUpdateState(updateState + 5);
+      }
+    } catch (error) {
+      // Handle any errors during the API call
+      console.error("Error uploading images:", error);
+    }
+  };
+
+  const handleAddImage = (e) => {
+    const files = Array.from(e.target.files);
+    setBusImg(files);
+  };
+
+ 
+  
+  
+
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
@@ -421,16 +470,17 @@ const UpdateForm = () => {
       </Typography>
       <h2>1. Intro</h2>
       <div>
-      <label>
-        blog Status :
-        <input 
-          type="checkbox" 
-          checked={isChecked} 
-          onChange={handleCheckboxChange} 
-        />
-        {isChecked ? "True" : "False"}
-      </label>
-    </div>
+        <label>
+          <strong>Public :</strong>
+          <input
+            type="checkbox"
+            checked={isChecked}
+            onChange={handleCheckboxChange}
+          />{" "}
+          {isChecked ? "True" : "False"}
+        </label>
+      </div>
+      <br />
       <TextField
         label="Bus Title"
         value={busTittle}
@@ -445,6 +495,8 @@ const UpdateForm = () => {
         fullWidth
         margin="normal"
       />
+      <input type="file" multiple onChange={handleAddImage} accept="image/*" />
+      <Button onClick={handleUploadImage}>Upload Image</Button>
       <TextField
         label="Bus Image URL"
         value={busImage}

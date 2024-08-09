@@ -10,8 +10,11 @@ import {
 import { RemoveCircle } from "@mui/icons-material";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import axios from "axios";
 
 const ComplexForm = () => {
+  const [updateState, setUpdateState] = useState(0);
+  const [BusImg, setBusImg] = useState([]);
   const [busTittle, setBusTittle] = useState(
     "218 DTC Bus Route – Timings: Babarpur Extension – Shadipur Depot"
   );
@@ -29,10 +32,16 @@ const ComplexForm = () => {
   const [section4Title, setSection4Title] = useState("All 218 DTC Bus Stops");
   const [landMarkTitle, setLandMarkTitle] = useState("Key Landmarks");
   const [freqOfBusTitle, setFreqOfBusTitle] = useState("Frequency of Bus");
-  const [totalNumOfStopsTitle, settotalNumOfStopsBusTitle] = useState("Total Number of Stops");
-  const [nearByAttractionsTitle, setNearByAttractionsTitle] = useState("Nearby Attractions");
-  const [safetyMeasuresTitle, setSafetyMeasuresTitle] = useState("Safety Measures");
-  const [dailyPassengersTipsTitle, setDailyPassengersTipsTitle] = useState("Daily Passengers Tips");
+  const [totalNumOfStopsTitle, settotalNumOfStopsBusTitle] = useState(
+    "Total Number of Stops"
+  );
+  const [nearByAttractionsTitle, setNearByAttractionsTitle] =
+    useState("Nearby Attractions");
+  const [safetyMeasuresTitle, setSafetyMeasuresTitle] =
+    useState("Safety Measures");
+  const [dailyPassengersTipsTitle, setDailyPassengersTipsTitle] = useState(
+    "Daily Passengers Tips"
+  );
   const [specialNotesTitle, setSpecialNotesTitle] = useState("Special Notes");
   const [subSection2CTitle, setSubSection2CTitle] = useState("Fare");
   const [subSection2ATitle, setSubSection2ATitle] = useState(
@@ -175,7 +184,13 @@ const ComplexForm = () => {
       subSection2B: { ...prevSection.subSection2B, title2B: subSection2BTitle },
       subSection2C: { ...prevSection.subSection2C, title2C: subSection2CTitle },
     }));
-  }, [section2Title, section2Des, subSection2ATitle, subSection2BTitle, subSection2CTitle]);
+  }, [
+    section2Title,
+    section2Des,
+    subSection2ATitle,
+    subSection2BTitle,
+    subSection2CTitle,
+  ]);
 
   useEffect(() => {
     setSection1((prev) => ({
@@ -275,7 +290,7 @@ const ComplexForm = () => {
       safetyMeasures,
       dailyPassengersTips,
       specialNotes,
-      isPublic:isChecked
+      isPublic: isChecked,
     };
 
     try {
@@ -351,6 +366,51 @@ const ComplexForm = () => {
     setIsChecked(event.target.checked);
   };
 
+  const handleUploadImage = async () => {
+    try {
+      // Initialize a new FormData object
+      const formData = new FormData();
+
+      // Append the bus number and each image to the FormData object
+      BusImg.forEach((img, index) => {
+        formData.append("image", img);
+      });
+      formData.append("busNumber", busNumber);
+      // Make the POST request to upload the images
+      const response = await axios.post(
+        "https://easytripss.onrender.com/admin/bus/images/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      // Handle the response
+      if (response.status) {
+        sessionStorage.setItem(
+          "img",
+          JSON.stringify(response?.data?.data?.image?.url)
+        );
+        setUpdateState(updateState + 5);
+      }
+    } catch (error) {
+      // Handle any errors during the API call
+      console.error("Error uploading images:", error);
+    }
+  };
+
+  const handleAddImage = (e) => {
+    const files = Array.from(e.target.files);
+    setBusImg(files);
+  };
+  useEffect(() => {
+    if (sessionStorage.getItem("img")) {
+      const Image = JSON.parse(sessionStorage.getItem("img"));
+      setBusImage(Image);
+    }
+  }, [updateState]);
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
@@ -358,16 +418,17 @@ const ComplexForm = () => {
       </Typography>
       <h2>1. Intro</h2>
       <div>
-      <label>
-        blog Status :
-        <input 
-          type="checkbox" 
-          checked={isChecked} 
-          onChange={handleCheckboxChange} 
-        />
-        {isChecked ? "True" : "False"}
-      </label>
-    </div>
+        <label>
+          <strong>Public :</strong>
+          <input
+            type="checkbox"
+            checked={isChecked}
+            onChange={handleCheckboxChange}
+          />{" "}
+          {isChecked ? "True" : "False"}
+        </label>
+      </div>
+      <br />
       <TextField
         label="Bus Title"
         value={busTittle}
@@ -382,6 +443,8 @@ const ComplexForm = () => {
         fullWidth
         margin="normal"
       />
+      <input type="file" multiple onChange={handleAddImage} accept="image/*" />
+      <Button onClick={handleUploadImage}>Upload Image</Button>
       <TextField
         label="Bus Image URL"
         value={busImage}

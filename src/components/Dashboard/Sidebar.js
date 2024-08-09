@@ -7,6 +7,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import PersonIcon from '@mui/icons-material/Person';
 import { styled } from '@mui/material/styles';
 import ViewListIcon from '@mui/icons-material/ViewList';
+import CollectionsIcon from '@mui/icons-material/Collections';
 
 const drawerWidth = 240;
 
@@ -32,6 +33,7 @@ const Sidebar = () => {
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Create Page', icon: <CreateIcon />, path: '/create-custom-page' },
     { text: 'Page List', icon: <ViewListIcon />, path: '/page-list' },
+    { text: 'Bus Images', icon: <CollectionsIcon />, path: '/bus-image-page' },
     // Add more navigation items as needed
   ];
 
