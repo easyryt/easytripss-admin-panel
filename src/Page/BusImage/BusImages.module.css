@@ -59,6 +59,9 @@
     display: flex;
     justify-content: space-around;
   }
+  .buttonGroup button{
+    margin: .2rem!important;
+  }
   
   @media (max-width: 768px) {
     .tableContainer {
